@@ -43,6 +43,17 @@ jobs:
         timeout-minutes: 10
         run: docker compose build
 
+      - name: Setup db
+        run: |
+          docker-compose up -d postgres
+          docker-compose logs postgres
+          sleep 5
+          cd postgres
+          psql "user=postgres hostaddr=127.0.0.1 port=5432 password=postgres" < scripts/db-v3.sql
+          cd ..
+          psql "user=postgres hostaddr=127.0.0.1 port=5432 password=postgres" < init.sql
+          cd ..
+      
       - name: Run containers
         timeout-minutes: 5
         run: |
